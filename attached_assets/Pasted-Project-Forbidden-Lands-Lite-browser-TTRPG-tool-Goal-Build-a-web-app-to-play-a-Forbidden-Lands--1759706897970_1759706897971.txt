@@ -1,0 +1,163 @@
+Project: Forbidden-Lands-Lite (browser TTRPG tool)
+
+Goal: Build a web app to play a Forbidden Lands-style game in the browser (single-player GM aid + small-group play). Use open/original wording only—no copyrighted rule text. Base mechanics on Year Zero–style dice pools (d6: 6 = success, 1 = bane).
+
+Tech:
+
+Vite + React + TypeScript
+
+Zustand or Redux Toolkit for state
+
+TailwindCSS UI
+
+LocalStorage (and optional Supabase later) for saves
+
+Vitest + React Testing Library
+
+Core features (MVP):
+
+Character Creator
+
+Fields: name, kin, profession, attributes, skills, talents, gear, pride, dark secret (text only).
+
+Dice pool calc: attribute d6 + skill d6 (+ gear d6). Show successes/banes.
+
+Save/load multiple characters.
+
+Character Sheet
+
+Edit attributes/skills; apply damage/conditions; add/remove items.
+
+Track XP and spend to level skills/talents (simple costs table you define).
+
+Dice Roller
+
+Pool builder (attribute/skill/gear d6), push once: re-roll non-success, count new banes.
+
+Log to session history; copy/export log.
+
+Exploration Tracker
+
+Hex/zone list with notes, terrain type, threat level, weather, time of day.
+
+Party inventory (shared), food/water tracking, rest/camp actions.
+
+Combat Helper
+
+Turn order with card/initiative value or simple numeric init.
+
+Per-round actions (fast/slow toggles), conditions, weapon/armor effects (numbers only).
+
+Quick roll buttons that call the dice roller.
+
+Items & Loot
+
+Item library (name, type, bonus dice, weight, notes).
+
+Add to character or party; encumbrance summary.
+
+Stronghold (Fortress) Lite
+
+Structures (e.g., palisade, workshop) with build time, upkeep, simple bonuses.
+
+Project tracker with days/resources remaining.
+
+Nice-to-have (after MVP):
+
+Small realtime sync for 2–5 players (Supabase channels).
+
+Printable sheets (A4).
+
+Import/export JSON for campaigns/characters.
+
+Map view (grid/hex), drop pins with notes.
+
+Pages/Routes:
+
+/ Home (create/load campaign)
+
+/character/:id Sheet & roller
+
+/explore/:campaignId Travel/day tracker
+
+/combat/:campaignId Initiative & actions
+
+/items Library
+
+/stronghold/:campaignId Projects
+
+/settings Theme, data reset, export/import
+
+Data models (TypeScript skeletons):
+
+type DicePool = { attribute: number; skill: number; gear: number };
+type RollResult = { dice: number[]; successes: number; banes: number; pushed?: boolean };
+
+type Item = { id: string; name: string; type: "weapon"|"armor"|"tool"|"consumable"; bonus?: number; weight?: number; notes?: string };
+
+type Character = {
+  id: string; name: string; kin?: string; profession?: string;
+  attributes: Record<"STR"|"AGI"|"WIT"|"EMP", number>;
+  skills: Record<string, number>;
+  talents: string[]; conditions: string[];
+  items: Item[]; xp: number; notes?: string;
+};
+
+type StrongholdProject = { id: string; name: string; daysTotal: number; daysLeft: number; upkeepPerWeek?: number; effect?: string };
+
+type Campaign = {
+  id: string; name: string; party: string[]; // character ids
+  hexes: { id: string; name: string; terrain: string; notes?: string; threat?: number }[];
+  weather?: string; timeOfDay?: "dawn"|"day"|"dusk"|"night";
+  partyInventory: Item[]; stronghold?: StrongholdProject[];
+  log: string[];
+};
+
+
+Key mechanics (original wording):
+
+Dice pools: Roll N d6. Count each 6 as 1 success. Each 1 on attribute dice while pushed = 1 bane (track as attribute damage). Pushing: once per roll, re-roll all non-6 dice; add new successes/banes; gear 1s can damage gear (track a “gear condition” counter).
+
+Initiative: Simple numeric order (lower first). Allow manual reorder and tie-break.
+
+Level-up: Spend XP to raise a skill by +1 up to a cap you define (e.g., 5). Log changes.
+
+UI requirements:
+
+Clean, keyboard-friendly; dark theme default.
+
+Sticky dice panel on right; collapsible log on left.
+
+Undo last action where safe.
+
+Persistence:
+
+Autosave to LocalStorage per campaign/character.
+
+Export/import JSON.
+
+Tests (at least 6):
+
+Dice pool counts successes/banes.
+
+Push logic never re-rolls 6s.
+
+Character save/load round-trips.
+
+Initiative ordering stable on edits.
+
+Encumbrance sums weights.
+
+Export/import fidelity.
+
+Out of scope / legal:
+
+Do not include official Forbidden Lands text, names, tables, or art.
+
+Use generic terms and original copy.
+
+Deliverables:
+
+Running dev server, seeded demo campaign + 2 demo characters.
+
+Clear README with how to use, build, and deploy (Replit + static export).
