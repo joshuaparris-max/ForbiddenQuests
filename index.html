@@ -281,6 +281,11 @@ function showChoices(choices) {
 }
 
 function goTo(nodeId) {
+  // Handle dynamic node resolution for malgrath fight ending
+  if (nodeId === '_dynamic_malgrath_end') {
+    nodeId = state.flags.hasPhylactery ? 'ending_victory_clean' : 'ending_victory_hard';
+  }
+  
   const node = nodes[nodeId];
   if (!node) { log('ERROR: missing node — ' + nodeId); return; }
   document.getElementById('choices').innerHTML = '';
@@ -785,21 +790,6 @@ function resetGame() {
   state.depth = "Surface";
   state.flags = {};
   updateStats();
-}
-
-// ─── FIX CONDITIONAL NEXT IN malgrath_fight ──────────────────────────────────
-// Overwrite the fight node's choices with a dynamic getter
-nodes.malgrath_fight.choices = [{
-  text: 'Finish it.',
-  next: '_dynamic_malgrath_end'
-}];
-
-const _origGoTo = goTo;
-function goTo(nodeId) {
-  if (nodeId === '_dynamic_malgrath_end') {
-    nodeId = state.flags.hasPhylactery ? 'ending_victory_clean' : 'ending_victory_hard';
-  }
-  _origGoTo(nodeId);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
